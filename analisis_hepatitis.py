@@ -13,6 +13,27 @@ def main() -> None:
 
     df = pd.concat([X, y], axis=1)
 
+    comprension_datos(df)
+
+    return
+
+
+def comprension_datos(df) -> None:
+    print(df.info())
+    print(f"{'':=^32}")
+
+    print("\nDimensiones:")
+    print(df.shape)
+    print(f"{'':=^32}")
+
+    print("\nValores faltantes:")
+    print(df.isnull().sum())
+    print(f"{'':=^32}")
+
+    print("\nResumen estadístico:")
+    print(df.describe())
+    print(f"{'':=^32}")
+
     return
 
 
