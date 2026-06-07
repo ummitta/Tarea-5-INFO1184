@@ -15,6 +15,23 @@ def main() -> None:
 
     comprension_datos(df)
 
+    preparacion_datos(df)
+
+    return
+
+def preparacion_datos(df) -> None:
+    vars_numericas = [
+        "Age",
+        "Bilirubin",
+        "Alk Phosphate",
+        "Sgot",
+        "Albumin",
+        "Protime"
+    ]
+
+    for col in vars_numericas:
+        df[col] = df[col].fillna(df[col].median())
+
     return
 
 
