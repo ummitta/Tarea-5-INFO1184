@@ -39,6 +39,134 @@ def edad_supervivencia(df):
     return
 
 
+def ascitis_supervivencia(df):
+    tabla = pd.crosstab(df["Ascites"], df["Class"])
+
+    tabla.plot(kind="bar", figsize=(7, 5))
+
+    plt.title("Ascitis vs resultado")
+    plt.xlabel("Ascitis")
+    plt.ylabel("Cantidad de pacientes")
+    plt.xticks(rotation=0)
+    plt.grid(True)
+
+    plt.show()
+    return
+
+
+def albumina_supervivencia(df):
+    plt.figure(figsize=(6, 5))
+
+    muere = df[df["Class"] == "Muere"]["Albumin"]
+    sobrevive = df[df["Class"] == "Sobrevive"]["Albumin"]
+
+    plt.boxplot(
+        [muere, sobrevive],
+        tick_labels=["Muere", "Sobrevive"]
+    )
+
+    plt.title("Albúmina según resultado")
+    plt.xlabel("Resultado")
+    plt.ylabel("Nivel de albúmina")
+    plt.grid(True)
+
+    plt.show()
+    return
+
+
+def bilirrubina_supervivencia(df):
+    plt.figure(figsize=(6, 5))
+
+    muere = df[df["Class"] == "Muere"]["Bilirubin"]
+    sobrevive = df[df["Class"] == "Sobrevive"]["Bilirubin"]
+
+    plt.boxplot(
+        [muere, sobrevive],
+        tick_labels=["Muere", "Sobrevive"]
+    )
+
+    plt.title("Bilirrubina según resultado")
+    plt.xlabel("Resultado")
+    plt.ylabel("Bilirrubina")
+    plt.grid(True)
+
+    plt.savefig(
+        "bilirrubina_supervivencia.png",
+        bbox_inches="tight"
+    )
+
+    plt.show()
+    return
+
+
+def matriz_correlacion(df, vars_categoricas):
+    # Se crea una copia para no modificar los valores del DataFrame original
+    df_correlacion = df.copy()
+
+    # Convierte la variable objetivo en números
+    df_correlacion["Class"] = df_correlacion["Class"].map({
+        "Muere": 0,
+        "Sobrevive": 1
+    })
+
+    # Convierte el sexo en números
+    df_correlacion["Sex"] = df_correlacion["Sex"].map({
+        "Hombre": 0,
+        "Mujer": 1
+    })
+
+    # Convierte las variables de tipo Sí/No en números
+    for col in vars_categoricas:
+        df_correlacion[col] = df_correlacion[col].map({
+            "No": 0,
+            "Si": 1
+        })
+
+    # Calcula las correlaciones
+    corr = df_correlacion.corr(numeric_only=True)
+
+    plt.figure(figsize=(12, 10))
+
+    plt.imshow(
+        corr,
+        cmap="coolwarm",
+        vmin=-1,
+        vmax=1
+    )
+
+    plt.colorbar()
+
+    plt.xticks(
+        range(len(corr.columns)),
+        corr.columns,
+        rotation=90
+    )
+
+    plt.yticks(
+        range(len(corr.columns)),
+        corr.columns
+    )
+
+    # Agrega el valor numérico de cada correlación
+    for i in range(len(corr.columns)):
+        for j in range(len(corr.columns)):
+            plt.text(
+                j,
+                i,
+                f"{corr.iloc[i, j]:.2f}",
+                ha="center",
+                va="center",
+                color="black",
+                fontsize=8
+            )
+
+    plt.title("Matriz de correlación")
+    plt.tight_layout()
+
+    plt.show()
+    return
+
+
 # Etapas de la metodología CRISP-DM
 def comprension_datos(df) -> None:
     print(df.info())
@@ -117,6 +245,14 @@ def preparacion_datos(df) -> None:
     # Gráficos
     distribucion_edades(df)
     edad_supervivencia(df)
+    ascitis_supervivencia(df)
+    albumina_supervivencia(df)
+    bilirrubina_supervivencia(df)
+
+    # No se incluye Sex porque se transforma por separado
+    variables_si_no = vars_categoricas[1:]
+
+    matriz_correlacion(df, variables_si_no)
 
     return
 
